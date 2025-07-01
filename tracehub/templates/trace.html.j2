@@ -1,0 +1,61 @@
+<!doctype html>
+<title>Trace {{trace.name}}</title>
+<h3>Trace {{trace.name}}</h3>
+<ul>
+<li>Size: {{ trace.size | filesizeformat }}</li>
+<li>Uploaded By: {{ trace.user }}</li>
+<li>Uploaded At: {{ trace.upload_time | fromtimestamp }}</li>
+</ul>
+<a href="{{ url_for("download_trace", trace_key=trace_key) }}">Download Trace</a>
+<a href="javascript:void(0)" id="openbtn">Open in Perfetto UI</a>
+
+<script type="text/javascript">
+const perfetto_url = "https://ui.perfetto.dev"
+const openbtn = document.getElementById("openbtn")
+
+function open_trace(arraybuf, traceUrl) {
+  const win = window.open(perfetto_url)
+  if (!win) {
+    openbtn.style.background = "#f3ca63";
+    openbtn.onclick = () => open_trace(arraybuf, traceUrl)
+    console.log("Popups blocked, manually click button again");
+    return
+  } 
+  
+  const timer = setInterval(() => win.postMessage("PING", perfetto_url), 50)
+
+  const onMessageHandler = (evt) => {
+    if (evt.data !== "PONG") return;
+    
+    window.clearInterval(timer)
+    window.removeEventListener("message", onMessageHandler)
+
+    const reopenUrl = new URL(location.href)
+    reopenUrl.hash = `#reopen=${traceUrl}`
+    console.log(reopenUrl.toString());
+    win.postMessage({
+      perfetto: {
+        buffer: arraybuf,
+        title: "{{ trace.name }}",
+        url: reopenUrl.toString(),
+      }
+    }, perfetto_url);
+  };
+  
+  window.addEventListener("message", onMessageHandler); 
+}
+
+async function fetchAndOpen(traceUrl) {
+  console.log("Fetching trace from ${traceUrl}\n");
+  openbtn.innerText = "Loading..."
+  const resp = await fetch(traceUrl);
+  const blob = await resp.blob();
+  const buf = await blob.arrayBuffer();
+  console.log("fetch() complete");
+  openbtn.innerText = "Click to Open in Perfetto"
+  open_trace(buf, traceUrl);
+}
+
+openbtn.onclick = () => fetchAndOpen("{{ url_for("get_trace_data", trace_key=trace_key) }}");
+
+</script>

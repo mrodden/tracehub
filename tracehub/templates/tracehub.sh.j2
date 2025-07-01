@@ -1,0 +1,17 @@
+#!/bin/bash
+
+error() {
+        echo "error:" $* >&2
+}
+
+die() {
+        [ -n "$1" ] && error "$*"
+        exit 1
+}
+
+UPLOAD_URL="{{ url_for("post_trace", _external=True) }}"
+CURL_BIN=$(which curl)
+
+[ -n "$CURL_BIN" ] || die "'curl' not found. Please install 'curl' and re-run."
+
+$CURL_BIN -F trace=@"$1" -F name=$(basename $1) -F user=$(whoami) $UPLOAD_URL

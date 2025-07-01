@@ -1,0 +1,31 @@
+<!doctype html>
+<title>Tracehub</title>
+<h2>Latest Traces</h2>
+<table>
+<thead>
+<tr>
+  <th>Name</th>
+  <th>Upload Time</th>
+</tr>
+</thead>
+{% for trace in traces %}
+<tr>
+  <td><a href="{{ url_for("get_trace", trace_key=trace.key) }}">{{ trace.name }}</a></td>
+  <td>{{ trace.upload_time | fromtimestamp }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<h2>Uploading</h2>
+<div id="upload-instructions">
+<pre>
+curl -sS {{ url_for("tracehub_cli", _external=True) }} -o tracehub
+chmod a+x ./tracehub
+tracehub my-trace-file.json.gz
+</pre>
+
+Or in one line
+<pre>
+curl -sS {{ url_for("tracehub_cli", _external=True) }} | bash -s -- my-trace-file.json.gz
+</pre>
+</div>
