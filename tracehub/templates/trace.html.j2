@@ -1,6 +1,11 @@
-<!doctype html>
-<title>Trace {{trace.name}}</title>
-<h3>Trace {{trace.name}}</h3>
+{% extends "base.html.j2" %}
+
+{% block header %}
+  <h1>{% block title %}Trace {{trace.name}}{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+
 <ul>
 <li>Size: {{ trace.size | filesizeformat }}</li>
 <li>Uploaded By: {{ trace.user }}</li>
@@ -59,3 +64,4 @@ async function fetchAndOpen(traceUrl) {
 openbtn.onclick = () => fetchAndOpen("{{ url_for("get_trace_data", trace_key=trace_key) }}");
 
 </script>
+{% endblock %}

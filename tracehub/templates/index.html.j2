@@ -1,6 +1,13 @@
-<!doctype html>
-<title>Tracehub</title>
-<h2>Latest Traces</h2>
+{% extends "base.html.j2" %}
+{% block title %}Tracehub{% endblock %}
+{% block content %}
+<div class="container-fluid">
+<div class="row">
+
+
+<div class="col-md-3">
+<div class="d-flex flex-column alight-items-stretch pt-3">
+<h3>Latest Traces</h3>
 <table>
 <thead>
 <tr>
@@ -15,17 +22,37 @@
 </tr>
 {% endfor %}
 </table>
+</div>
+</div>
 
+<div class="col-md-9" id="upload-instructions">
+<div class="p-4 container">
 <h2>Uploading</h2>
-<div id="upload-instructions">
-<pre>
+<p>Download and use the <code>tracehub</code> helper script:</p>
+<div class="card text-bg-light mb-5">
+  <div class="card-body">
+    <code>
 curl -sS {{ url_for("tracehub_cli", _external=True) }} -o tracehub
 chmod a+x ./tracehub
 tracehub my-trace-file.json.gz
-</pre>
-
-Or in one line
-<pre>
-curl -sS {{ url_for("tracehub_cli", _external=True) }} | bash -s -- my-trace-file.json.gz
-</pre>
+    </code>
+  </div>
 </div>
+
+<p>Or in one line</p>
+<div class="card text-bg-light mb-5">
+  <div class="card-body">
+    <code>
+curl -sS {{ url_for("tracehub_cli", _external=True) }} | bash -s -- my-trace-file.json.gz
+    </code>
+  </div>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+</div>
+{% endblock %}
